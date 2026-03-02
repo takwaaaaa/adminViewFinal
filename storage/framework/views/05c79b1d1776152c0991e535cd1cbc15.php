@@ -1,1 +1,0 @@
-<?php /**PATH C:\laragon\www\AdminView\resources\views/layouts/sidebar-widget.blade.php ENDPATH**/ ?>
