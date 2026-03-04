@@ -1,6 +1,4 @@
-@extends('layouts.fullscreen-layout')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="relative z-1 bg-white p-6 sm:p-0">
         <div class="flex h-screen w-full flex-col justify-center sm:p-0 lg:flex-row">
             <!-- Form -->
@@ -25,17 +23,17 @@
                     </div>
                     <div>
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5">
-                            {{-- Google --}}
-<a href="{{ route('socialite.redirect', 'google') }}"
+                            
+<a href="<?php echo e(route('socialite.redirect', 'google')); ?>"
    class="inline-flex items-center justify-center gap-3 ...">
-    {{-- google svg --}}
+    
     Sign up with Google
 </a>
 
-{{-- Twitter --}}
-<a href="{{ route('socialite.redirect', 'twitter') }}"
+
+<a href="<?php echo e(route('socialite.redirect', 'twitter')); ?>"
    class="inline-flex items-center justify-center gap-3 ...">
-    {{-- twitter svg --}}
+    
     Sign up with X
 </a>
                         </div>
@@ -47,20 +45,20 @@
                                 <span class="bg-white p-2 text-gray-400 sm:px-5 sm:py-2">Or</span>
                             </div>
                         </div>
-                        <form method="POST" action="{{ route('signup.post') }}">
-    @csrf
+                        <form method="POST" action="<?php echo e(route('signup.post')); ?>">
+    <?php echo csrf_field(); ?>
     <div class="space-y-5">
 
-        {{-- Errors --}}
-        @if ($errors->any())
+        
+        <?php if($errors->any()): ?>
             <div class="rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
                 <ul class="list-disc list-inside space-y-1">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
+                    <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <li><?php echo e($error); ?></li>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </ul>
             </div>
-        @endif
+        <?php endif; ?>
 
         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <!-- First Name -->
@@ -69,7 +67,7 @@
                     First Name<span class="text-error-500">*</span>
                 </label>
                 <input type="text" id="fname" name="fname"
-                    value="{{ old('fname') }}"
+                    value="<?php echo e(old('fname')); ?>"
                     placeholder="Enter your first name"
                     class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
             </div>
@@ -79,7 +77,7 @@
                     Last Name<span class="text-error-500">*</span>
                 </label>
                 <input type="text" id="lname" name="lname"
-                    value="{{ old('lname') }}"
+                    value="<?php echo e(old('lname')); ?>"
                     placeholder="Enter your last name"
                     class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
             </div>
@@ -91,7 +89,7 @@
                 Email<span class="text-error-500">*</span>
             </label>
             <input type="email" id="email" name="email"
-                value="{{ old('email') }}"
+                value="<?php echo e(old('email')); ?>"
                 placeholder="Enter your email"
                 class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
         </div>
@@ -174,7 +172,26 @@
             <div class="bg-brand-950 relative hidden h-full w-full items-center lg:grid lg:w-1/2">
                 <div class="z-1 flex items-center justify-center">
                     <!-- ===== Common Grid Shape Start ===== -->
-                    <x-common.common-grid-shape />
+                    <?php if (isset($component)) { $__componentOriginal167809b0e97e5fdccea89d87d579f7f1 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal167809b0e97e5fdccea89d87d579f7f1 = $attributes; } ?>
+<?php $component = App\View\Components\Common\CommonGridShape::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('common.common-grid-shape'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\Common\CommonGridShape::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal167809b0e97e5fdccea89d87d579f7f1)): ?>
+<?php $attributes = $__attributesOriginal167809b0e97e5fdccea89d87d579f7f1; ?>
+<?php unset($__attributesOriginal167809b0e97e5fdccea89d87d579f7f1); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal167809b0e97e5fdccea89d87d579f7f1)): ?>
+<?php $component = $__componentOriginal167809b0e97e5fdccea89d87d579f7f1; ?>
+<?php unset($__componentOriginal167809b0e97e5fdccea89d87d579f7f1); ?>
+<?php endif; ?>
                     <div class="flex max-w-xs flex-col items-center">
                         <a href="/" class="mb-4 block">
                             <img src="./images/logo/auth-logo.svg" alt="Logo" />
@@ -200,4 +217,6 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.fullscreen-layout', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\laragon\www\AdminView\resources\views/pages/auth/signup.blade.php ENDPATH**/ ?>

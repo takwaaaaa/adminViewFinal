@@ -2,37 +2,38 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuditLog;
 use App\Models\AdminNotification;
 use App\Models\User;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class AdminManagementController extends Controller
 {
-    public function index(): View
+    public function index()
     {
-        $pendingUsers = User::where('approval_status', 'pending')->latest()->get();
+        // Pending: users waiting for approval (any role)
+        $pendingUsers = User::where('approval_status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
+        // Admins table: only superadmin role, already approved
+        // Exclude the currently logged-in superadmin (they manage others, not themselves here)
         $admins = User::where('role', 'superadmin')
             ->where('approval_status', 'approved')
-            ->latest()
+            ->where('id', '!=', auth()->id())  // ← exclude self
+            ->orderBy('approved_at', 'desc')
             ->paginate(15);
 
-        return view('pages.admin-management.index', [
-            'title'        => 'Admin Management',
-            'pendingUsers' => $pendingUsers,
-            'admins'       => $admins,
-        ]);
+        return view('pages.admin-management.index', compact('pendingUsers', 'admins'));
     }
 
-    public function approve(Request $request, User $user): RedirectResponse
+    public function approve(Request $request, User $user)
     {
-        $request->validate(['role' => ['required', 'in:user,superadmin']]);
+        $role = in_array($request->role, ['user', 'superadmin']) ? $request->role : 'user';
 
         $user->update([
+            'role'            => $role,
             'approval_status' => 'approved',
-            'role'            => $request->role,
             'status'          => 'active',
             'approved_at'     => now(),
             'approved_by'     => auth()->id(),
@@ -41,49 +42,62 @@ class AdminManagementController extends Controller
         AdminNotification::create([
             'triggered_by' => $user->id,
             'type'         => 'account_approved',
-            'message'      => "{$user->name} was approved as " . ucfirst($request->role) . '.',
+            'message'      => "{$user->name} has been approved as " . ($role === 'superadmin' ? 'Admin' : 'User') . ".",
         ]);
+
+        AuditLog::record(
+            $role === 'superadmin' ? 'admin.approved' : 'user.approved',
+            $user,
+            ['role' => $role]
+        );
 
         return back()->with('success', "{$user->name} approved successfully.");
     }
 
-    public function reject(User $user): RedirectResponse
+    public function reject(Request $request, User $user)
     {
-        $name  = $user->name;
-        $email = $user->email;
+        AuditLog::record('user.rejected', $user);
 
-        // Create notification before deleting so triggered_by FK is valid
         AdminNotification::create([
             'triggered_by' => $user->id,
             'type'         => 'account_rejected',
-            'message'      => "{$name} ({$email})'s sign-up request was rejected.",
+            'message'      => "{$user->name}'s account request was rejected.",
         ]);
 
         $user->delete();
 
-        return back()->with('success', "{$name} rejected and removed.");
+        return back()->with('success', "User rejected and removed.");
     }
 
-    public function toggleStatus(User $user): RedirectResponse
+    public function toggleStatus(Request $request, User $user)
     {
         $newStatus = $user->status === 'active' ? 'inactive' : 'active';
         $user->update(['status' => $newStatus]);
 
         AdminNotification::create([
-            'triggered_by' => $user->id,
-            'type'         => 'account_' . $newStatus,
-            'message'      => "Admin {$user->name}'s account was {$newStatus}d.",
+            'triggered_by' => auth()->id(),
+            'type'         => $newStatus === 'active' ? 'account_activated' : 'account_deactivated',
+            'message'      => auth()->user()->name . " {$newStatus} admin {$user->name}.",
         ]);
 
-        return back()->with('success', "Admin {$newStatus}d successfully.");
+        AuditLog::record(
+            $newStatus === 'active' ? 'admin.activated' : 'admin.deactivated',
+            $user,
+            ['status' => $newStatus]
+        );
+
+        return back()->with('success', "{$user->name} has been {$newStatus}.");
     }
 
-    public function edit(User $user): View
+    public function edit(User $user)
     {
-        return view('pages.admin-management.edit', ['title' => 'Edit Admin', 'editAdmin' => $user]);
+        return view('pages.admin-management.edit', [
+            'editAdmin' => $user,
+            'title'     => 'Edit Admin',
+        ]);
     }
 
-    public function update(Request $request, User $user): RedirectResponse
+    public function update(Request $request, User $user)
     {
         $validated = $request->validate([
             'fname' => ['required', 'string', 'max:100'],
@@ -93,6 +107,8 @@ class AdminManagementController extends Controller
             'bio'   => ['nullable', 'string', 'max:255'],
         ]);
 
+        $before = $user->only(['name', 'email', 'phone', 'bio']);
+
         $user->update([
             'name'  => trim($validated['fname'] . ' ' . $validated['lname']),
             'email' => $validated['email'],
@@ -100,16 +116,27 @@ class AdminManagementController extends Controller
             'bio'   => $validated['bio'] ?? null,
         ]);
 
-        return redirect()->route('admin-management.index')->with('success', 'Admin updated.');
+        $after = $user->fresh()->only(['name', 'email', 'phone', 'bio']);
+        $diff  = [];
+        foreach ($before as $key => $oldVal) {
+            if ($oldVal !== $after[$key]) {
+                $diff[$key] = ['from' => $oldVal, 'to' => $after[$key]];
+            }
+        }
+        if (!empty($diff)) {
+            AuditLog::record('admin.updated', $user, $diff);
+        }
+
+        return redirect()->route('admin-management.index')
+            ->with('success', "{$user->name} updated successfully.");
     }
 
-    public function destroy(User $user): RedirectResponse
+    public function destroy(User $user)
     {
-        if ($user->id === auth()->id()) {
-            return back()->withErrors(['error' => 'You cannot delete your own account here.']);
-        }
+        AuditLog::record('admin.deleted', $user);
         $name = $user->name;
         $user->delete();
-        return redirect()->route('admin-management.index')->with('success', "Admin \"{$name}\" deleted.");
+
+        return back()->with('success', "{$name} has been deleted.");
     }
 }

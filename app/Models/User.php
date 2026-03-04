@@ -42,23 +42,43 @@ class User extends Authenticatable
     }
 
     /**
-     * Returns a URL to the user's avatar.
-     * If no avatar is uploaded, generates a clean initials avatar via UI Avatars.
+     * Returns avatar as a data URI (bypasses Windows symlink issues entirely).
+     * Falls back to inline SVG initials if no upload exists.
      */
     public function getAvatarUrlAttribute(): string
     {
-        // Use uploaded avatar if it exists on disk
-        if ($this->avatar && file_exists(storage_path('app/public/' . $this->avatar))) {
-            return asset('storage/' . $this->avatar);
+        if ($this->avatar) {
+            $diskPath = storage_path('app/public/' . $this->avatar);
+
+            if (file_exists($diskPath)) {
+                // Read the file directly and return as data URI
+                // This bypasses the broken Windows storage symlink completely
+                $mime     = mime_content_type($diskPath);
+                $data     = base64_encode(file_get_contents($diskPath));
+                return "data:{$mime};base64,{$data}";
+            }
         }
 
-        // Generate initials-based avatar — no hardcoded face
-        $name        = urlencode($this->name ?: 'User');
-        $background  = 'E0E7FF'; // indigo-100
-        $color       = '4F46E5'; // indigo-600
-        $size        = 128;
+        // Inline SVG initials fallback — no external requests
+        $name     = $this->name ?: 'User';
+        $words    = preg_split('/\s+/', trim($name));
+        $initials = strtoupper(
+            count($words) >= 2
+                ? $words[0][0] . $words[1][0]
+                : substr($words[0], 0, 2)
+        );
 
-        return "https://ui-avatars.com/api/?name={$name}&size={$size}&background={$background}&color={$color}&bold=true&format=svg";
+        $bg   = '#E0E7FF';
+        $text = '#4338CA';
+
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">'
+             . '<rect width="128" height="128" rx="64" fill="' . $bg . '"/>'
+             . '<text x="64" y="64" dominant-baseline="central" text-anchor="middle" '
+             . 'font-family="ui-sans-serif,system-ui,sans-serif" font-size="52" '
+             . 'font-weight="700" fill="' . $text . '">' . $initials . '</text>'
+             . '</svg>';
+
+        return 'data:image/svg+xml;base64,' . base64_encode($svg);
     }
 
     // ── Role / status helpers ─────────────────────────────────────────────────

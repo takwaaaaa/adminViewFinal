@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\AdminManagementController;
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\NotificationController;
 
 // ─── Guest ────────────────────────────────────────────────────────────────────
@@ -71,6 +72,9 @@ Route::middleware(['auth', 'approved'])->group(function () {
         Route::get('/admin-management/{user}/edit', [AdminManagementController::class, 'edit'])->name('admin-management.edit');
         Route::patch('/admin-management/{user}', [AdminManagementController::class, 'update'])->name('admin-management.update');
         Route::delete('/admin-management/{user}', [AdminManagementController::class, 'destroy'])->name('admin-management.destroy');
+
+        // Audit Logs
+        Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
     });
 
     // ── All other pages ───────────────────────────────────────────────────────
