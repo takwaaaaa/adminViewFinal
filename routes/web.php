@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\AdminManagementController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\NotificationController;
 
@@ -35,18 +36,12 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->middleware('auth')->name('logout');
 
-// ─── Pending approval (logged in but not yet approved) ────────────────────────
-Route::get('/pending-approval', function () {
-    if (auth()->check() && auth()->user()->isApproved()) {
-        return redirect()->route('dashboard');
-    }
-    return view('pages.auth.pending-approval', ['title' => 'Awaiting Approval']);
-})->middleware('auth')->name('pending-approval');
-
 // ─── Protected (approved + active users) ─────────────────────────────────────
+// ALL permission checks are done inside controllers, not via middleware.
+// Superadmin always passes. Non-superadmin needs the matching Spatie permission.
 Route::middleware(['auth', 'approved'])->group(function () {
 
-    Route::get('/', fn() => view('pages.dashboard.ecommerce', ['title' => 'E-commerce Dashboard']))->name('dashboard');
+    Route::get('/', fn() => view('pages.dashboard.ecommerce', ['title' => 'Dashboard']))->name('dashboard');
 
     // Profile
     Route::get('/profile',    [ProfileController::class, 'edit'])->name('profile');
@@ -57,62 +52,37 @@ Route::middleware(['auth', 'approved'])->group(function () {
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])
         ->name('notifications.mark-all-read');
 
-    // ── Superadmin only ───────────────────────────────────────────────────────
+    // ── User Management ───────────────────────────────────────────────────────
+    Route::resource('users', UserManagementController::class)->except(['show']);
+    Route::patch('/users/{user}/toggle-status', [UserManagementController::class, 'toggleStatus'])
+        ->name('users.toggle-status');
+
+    // ── Role Management ───────────────────────────────────────────────────────
+    Route::get('/roles',                      [RoleController::class, 'index'])->name('roles.index');
+    Route::get('/roles/create',               [RoleController::class, 'create'])->name('roles.create');
+    Route::post('/roles',                     [RoleController::class, 'store'])->name('roles.store');
+    Route::delete('/roles/{role}',            [RoleController::class, 'destroy'])->name('roles.destroy');
+    Route::get('/roles/{role}/permissions',   [RoleController::class, 'permissions'])->name('roles.permissions');
+    Route::patch('/roles/{role}/permissions', [RoleController::class, 'updatePermissions'])->name('roles.permissions.update');
+
+    // ── Audit Logs ────────────────────────────────────────────────────────────
+    Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
+
+    // ── Admin Management (superadmin only — no Spatie equivalent) ─────────────
     Route::middleware('superadmin')->group(function () {
-        // User Management
-        Route::resource('users', UserManagementController::class)->except(['show']);
-        Route::patch('/users/{user}/toggle-status', [UserManagementController::class, 'toggleStatus'])
-            ->name('users.toggle-status');
-
-        // Admin Management
-        Route::get('/admin-management', [AdminManagementController::class, 'index'])->name('admin-management.index');
-        Route::patch('/admin-management/{user}/approve', [AdminManagementController::class, 'approve'])->name('admin-management.approve');
-        Route::delete('/admin-management/{user}/reject', [AdminManagementController::class, 'reject'])->name('admin-management.reject');
+        Route::get('/admin-management',                        [AdminManagementController::class, 'index'])->name('admin-management.index');
         Route::patch('/admin-management/{user}/toggle-status', [AdminManagementController::class, 'toggleStatus'])->name('admin-management.toggle-status');
-        Route::get('/admin-management/{user}/edit', [AdminManagementController::class, 'edit'])->name('admin-management.edit');
-        Route::patch('/admin-management/{user}', [AdminManagementController::class, 'update'])->name('admin-management.update');
-        Route::delete('/admin-management/{user}', [AdminManagementController::class, 'destroy'])->name('admin-management.destroy');
-
-        // Audit Logs
-        Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
+        Route::get('/admin-management/{user}/edit',            [AdminManagementController::class, 'edit'])->name('admin-management.edit');
+        Route::patch('/admin-management/{user}',               [AdminManagementController::class, 'update'])->name('admin-management.update');
+        Route::delete('/admin-management/{user}',              [AdminManagementController::class, 'destroy'])->name('admin-management.destroy');
     });
 
-    // ── All other pages ───────────────────────────────────────────────────────
-    Route::get('/calendar',     fn() => view('pages.calender',    ['title' => 'Calendar']))->name('calendar');
-    Route::get('/task',         fn() => view('pages.coming-soon', ['title' => 'Task']))->name('task');
-    Route::get('/ai-assistant', fn() => view('pages.coming-soon', ['title' => 'AI Assistant']))->name('ai-assistant');
-    Route::get('/analytics',    fn() => view('pages.coming-soon', ['title' => 'Analytics']))->name('analytics');
-    Route::get('/marketing',    fn() => view('pages.coming-soon', ['title' => 'Marketing']))->name('marketing');
-    Route::get('/crm',          fn() => view('pages.coming-soon', ['title' => 'CRM']))->name('crm');
-
-    Route::get('/products',        fn() => view('pages.coming-soon', ['title' => 'Products']))->name('products');
-    Route::get('/product-details', fn() => view('pages.coming-soon', ['title' => 'Product Details']))->name('product-details');
-    Route::get('/orders',          fn() => view('pages.coming-soon', ['title' => 'Orders']))->name('orders');
-    Route::get('/order-details',   fn() => view('pages.coming-soon', ['title' => 'Order Details']))->name('order-details');
-    Route::get('/customers',       fn() => view('pages.coming-soon', ['title' => 'Customers']))->name('customers');
-
-    Route::get('/chat',            fn() => view('pages.coming-soon', ['title' => 'Chat']))->name('chat');
-    Route::get('/support',         fn() => view('pages.coming-soon', ['title' => 'Support Ticket']))->name('support');
-    Route::get('/support/details', fn() => view('pages.coming-soon', ['title' => 'Ticket Details']))->name('support.details');
-    Route::get('/email',           fn() => view('pages.coming-soon', ['title' => 'Email Inbox']))->name('email');
-    Route::get('/email/compose',   fn() => view('pages.coming-soon', ['title' => 'Compose Email']))->name('email.compose');
-
+    // ── Other pages ───────────────────────────────────────────────────────────
+    Route::get('/calendar',      fn() => view('pages.calender',           ['title' => 'Calendar']))->name('calendar');
     Route::get('/form-elements', fn() => view('pages.form.form-elements', ['title' => 'Form Elements']))->name('form-elements');
-    Route::get('/form-layout',   fn() => view('pages.coming-soon',        ['title' => 'Form Layout']))->name('form-layout');
-
-    Route::get('/basic-tables', fn() => view('pages.tables.basic-tables', ['title' => 'Basic Tables']))->name('basic-tables');
-    Route::get('/data-tables',  fn() => view('pages.coming-soon',         ['title' => 'Data Tables']))->name('data-tables');
-
-    Route::get('/blank',     fn() => view('pages.blank',            ['title' => 'Blank']))->name('blank');
-    Route::get('/error-404', fn() => view('pages.errors.error-404', ['title' => '404 Error']))->name('error-404');
-
-    Route::get('/line-chart', fn() => view('pages.chart.line-chart', ['title' => 'Line Chart']))->name('line-chart');
-    Route::get('/bar-chart',  fn() => view('pages.chart.bar-chart',  ['title' => 'Bar Chart']))->name('bar-chart');
-
-    Route::get('/alerts',  fn() => view('pages.ui-elements.alerts',  ['title' => 'Alerts']))->name('alerts');
-    Route::get('/avatars', fn() => view('pages.ui-elements.avatars', ['title' => 'Avatars']))->name('avatars');
-    Route::get('/badge',   fn() => view('pages.ui-elements.badges',  ['title' => 'Badges']))->name('badges');
-    Route::get('/buttons', fn() => view('pages.ui-elements.buttons', ['title' => 'Buttons']))->name('buttons');
-    Route::get('/image',   fn() => view('pages.ui-elements.images',  ['title' => 'Images']))->name('images');
-    Route::get('/videos',  fn() => view('pages.ui-elements.videos',  ['title' => 'Videos']))->name('videos');
+    Route::get('/basic-tables',  fn() => view('pages.tables.basic-tables',['title' => 'Basic Tables']))->name('basic-tables');
+    Route::get('/blank',         fn() => view('pages.blank',              ['title' => 'Blank']))->name('blank');
+    Route::get('/error-404',     fn() => view('pages.errors.error-404',   ['title' => '404 Error']))->name('error-404');
+    Route::get('/line-chart',    fn() => view('pages.chart.line-chart',   ['title' => 'Line Chart']))->name('line-chart');
+    Route::get('/bar-chart',     fn() => view('pages.chart.bar-chart',    ['title' => 'Bar Chart']))->name('bar-chart');
 });

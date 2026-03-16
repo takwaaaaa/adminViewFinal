@@ -137,7 +137,7 @@
         {{-- Footer --}}
         @if($notifications->count() > 0 && auth()->check() && auth()->user()->isSuperAdmin())
         <div class="border-t border-gray-100 dark:border-gray-700 px-4 py-2.5">
-            <a href="{{ route('admin-management.index') }}"
+            <a href="{{ route('users.index') }}"
                 class="flex w-full items-center justify-center gap-1 text-xs font-medium text-brand-500 hover:text-brand-600 dark:text-brand-400">
                 View pending approvals
                 <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -59,12 +59,6 @@
         <nav class="mb-6">
             <div class="flex flex-col gap-4">
                 <?php $__currentLoopData = $menuGroups; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $gi => $group): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-
-                
-                <?php if(!empty($group['superadmin']) && (!auth()->check() || !auth()->user()->isSuperAdmin())): ?>
-                    <?php continue; ?>
-                <?php endif; ?>
-
                 <div>
                     
                     <h2 class="mb-4 flex text-xs font-medium uppercase tracking-widest text-gray-400 dark:text-gray-500"
@@ -91,21 +85,18 @@
                                     (!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen) ? 'xl:justify-center' : ''
                                 ]">
 
-                                
                                 <span class="shrink-0"
                                     :class="isOpen(<?php echo e($gi); ?>, <?php echo e($ii); ?>) ? 'text-brand-500' : 'text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200'">
                                     <?php echo MenuHelper::getIconSvg($item['icon']); ?>
 
                                 </span>
 
-                                
                                 <span x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
                                       class="flex-1 whitespace-nowrap overflow-hidden text-left">
                                     <?php echo e($item['name']); ?>
 
                                 </span>
 
-                                
                                 <?php if(!empty($item['new'])): ?>
                                 <span x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
                                       class="inline-flex items-center rounded bg-brand-500 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-white">
@@ -113,7 +104,6 @@
                                 </span>
                                 <?php endif; ?>
 
-                                
                                 <svg x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
                                      class="ml-auto h-4 w-4 shrink-0 transition-transform duration-200"
                                      :class="isOpen(<?php echo e($gi); ?>, <?php echo e($ii); ?>) ? 'rotate-180 text-brand-500' : ''"

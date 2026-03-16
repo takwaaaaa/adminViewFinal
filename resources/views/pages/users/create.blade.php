@@ -15,7 +15,7 @@
 <div class="max-w-2xl">
     <div class="mb-6">
         <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Add New User</h2>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">User will be auto-approved and active immediately.</p>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">User will be active immediately.</p>
     </div>
 
     <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
@@ -34,35 +34,66 @@
                     <input type="text" name="fname" value="{{ old('fname') }}" placeholder="John"
                         class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 placeholder:text-gray-400 shadow-sm focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-600 dark:bg-gray-900 dark:text-white @error('fname') border-red-500 @enderror" />
                 </div>
+
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Last Name</label>
                     <input type="text" name="lname" value="{{ old('lname') }}" placeholder="Doe"
                         class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 placeholder:text-gray-400 shadow-sm focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-600 dark:bg-gray-900 dark:text-white @error('lname') border-red-500 @enderror" />
                 </div>
+
                 <div class="sm:col-span-2">
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Email Address</label>
                     <input type="email" name="email" value="{{ old('email') }}" placeholder="john@example.com"
                         class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 placeholder:text-gray-400 shadow-sm focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-600 dark:bg-gray-900 dark:text-white @error('email') border-red-500 @enderror" />
                 </div>
+
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
                     <input type="password" name="password"
-                        class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white shadow-sm focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10" />
+                        class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white shadow-sm focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 @error('password') border-red-500 @enderror" />
                 </div>
+
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
                     <input type="password" name="password_confirmation"
                         class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white shadow-sm focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10" />
                 </div>
+
                 <div>
                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Phone <span class="text-gray-400 font-normal">(optional)</span></label>
                     <input type="text" name="phone" value="{{ old('phone') }}" placeholder="+1 555 000 000"
                         class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white shadow-sm focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10" />
                 </div>
+
                 <div>
-                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Bio / Role <span class="text-gray-400 font-normal">(optional)</span></label>
-                    <input type="text" name="bio" value="{{ old('bio') }}" placeholder="e.g. Editor"
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Bio <span class="text-gray-400 font-normal">(optional)</span></label>
+                    <input type="text" name="bio" value="{{ old('bio') }}" placeholder="Short bio..."
                         class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm dark:border-gray-600 dark:bg-gray-900 dark:text-white shadow-sm focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10" />
+                </div>
+
+                {{-- Role --}}
+                <div class="sm:col-span-2">
+                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Assign Role <span class="text-red-500">*</span>
+                    </label>
+                    @if($roles->isEmpty())
+                    <div class="rounded-lg border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-700">
+                        No roles available. <a href="{{ route('roles.create') }}" class="font-semibold underline">Create a role first</a>.
+                    </div>
+                    @else
+                    <select name="role"
+                        class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 text-sm text-gray-800 shadow-sm focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-600 dark:bg-gray-900 dark:text-white @error('role') border-red-500 @enderror">
+                        <option value="">-- Select a role --</option>
+                        @foreach($roles as $role)
+                        <option value="{{ $role->name }}" {{ old('role') === $role->name ? 'selected' : '' }}>
+                            {{ ucfirst($role->name) }}
+                            @if($role->permissions->count())
+                                ({{ $role->permissions->count() }} permissions)
+                            @endif
+                        </option>
+                        @endforeach
+                    </select>
+                    @endif
                 </div>
             </div>
 

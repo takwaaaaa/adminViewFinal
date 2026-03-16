@@ -6,67 +6,20 @@ use App\Models\AuditLog;
 use App\Models\AdminNotification;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 
 class AdminManagementController extends Controller
 {
     public function index()
     {
-        // Pending: users waiting for approval (any role)
-        $pendingUsers = User::where('approval_status', 'pending')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        // Admins table: only superadmin role, already approved
-        // Exclude the currently logged-in superadmin (they manage others, not themselves here)
+        // Only approved admins — no pending section anymore
         $admins = User::where('role', 'superadmin')
             ->where('approval_status', 'approved')
-            ->where('id', '!=', auth()->id())  // ← exclude self
+            ->where('id', '!=', auth()->id())
             ->orderBy('approved_at', 'desc')
             ->paginate(15);
 
-        return view('pages.admin-management.index', compact('pendingUsers', 'admins'));
-    }
-
-    public function approve(Request $request, User $user)
-    {
-        $role = in_array($request->role, ['user', 'superadmin']) ? $request->role : 'user';
-
-        $user->update([
-            'role'            => $role,
-            'approval_status' => 'approved',
-            'status'          => 'active',
-            'approved_at'     => now(),
-            'approved_by'     => auth()->id(),
-        ]);
-
-        AdminNotification::create([
-            'triggered_by' => $user->id,
-            'type'         => 'account_approved',
-            'message'      => "{$user->name} has been approved as " . ($role === 'superadmin' ? 'Admin' : 'User') . ".",
-        ]);
-
-        AuditLog::record(
-            $role === 'superadmin' ? 'admin.approved' : 'user.approved',
-            $user,
-            ['role' => $role]
-        );
-
-        return back()->with('success', "{$user->name} approved successfully.");
-    }
-
-    public function reject(Request $request, User $user)
-    {
-        AuditLog::record('user.rejected', $user);
-
-        AdminNotification::create([
-            'triggered_by' => $user->id,
-            'type'         => 'account_rejected',
-            'message'      => "{$user->name}'s account request was rejected.",
-        ]);
-
-        $user->delete();
-
-        return back()->with('success', "User rejected and removed.");
+        return view('pages.admin-management.index', compact('admins'));
     }
 
     public function toggleStatus(Request $request, User $user)

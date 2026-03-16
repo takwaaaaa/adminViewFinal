@@ -1,7 +1,8 @@
 <?php $__env->startSection('content'); ?>
     <div class="relative z-1 bg-white dark:bg-gray-900 p-6 sm:p-0">
         <div class="relative flex h-screen w-full flex-col justify-center sm:p-0 lg:flex-row">
-            <!-- Form -->
+
+            <!-- ── Form ───────────────────────────────────────────────────── -->
             <div class="flex w-full flex-1 flex-col lg:w-1/2">
                 <div class="mx-auto w-full max-w-md pt-10">
                     <a href="/"
@@ -65,16 +66,13 @@
                                         </div>
                                     <?php endif; ?>
 
-                                    <!-- Email -->
                                     <div>
                                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                                             Email<span class="text-red-500">*</span>
                                         </label>
-                                        <input type="email" id="email" name="email"
-                                            value="<?php echo e(old('email')); ?>"
+                                        <input type="email" name="email" value="<?php echo e(old('email')); ?>"
                                             placeholder="info@gmail.com"
-                                            class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 shadow-sm focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-white/30
-                                            <?php $__errorArgs = ['email'];
+                                            class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 shadow-sm focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-white/30 <?php $__errorArgs = ['email'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -84,17 +82,14 @@ endif;
 unset($__errorArgs, $__bag); ?>" />
                                     </div>
 
-                                    <!-- Password -->
                                     <div>
                                         <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                                             Password<span class="text-red-500">*</span>
                                         </label>
                                         <div x-data="{ showPassword: false }" class="relative">
-                                            <input :type="showPassword ? 'text' : 'password'"
-                                                name="password"
+                                            <input :type="showPassword ? 'text' : 'password'" name="password"
                                                 placeholder="Enter your password"
-                                                class="h-11 w-full rounded-lg border border-gray-300 bg-transparent py-2.5 pr-11 pl-4 text-sm text-gray-800 placeholder:text-gray-400 shadow-sm focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-white/30
-                                                <?php $__errorArgs = ['password'];
+                                                class="h-11 w-full rounded-lg border border-gray-300 bg-transparent py-2.5 pr-11 pl-4 text-sm text-gray-800 placeholder:text-gray-400 shadow-sm focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-white/30 <?php $__errorArgs = ['password'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
@@ -114,14 +109,12 @@ unset($__errorArgs, $__bag); ?>" />
                                         </div>
                                     </div>
 
-                                    <!-- Remember + Forgot -->
                                     <div class="flex items-center justify-between">
                                         <div x-data="{ checked: false }">
                                             <label for="remember_me"
                                                 class="flex cursor-pointer items-center text-sm font-normal text-gray-700 dark:text-gray-400 select-none">
                                                 <div class="relative">
-                                                    <input type="checkbox" id="remember_me" name="remember" class="sr-only"
-                                                        @change="checked = !checked" />
+                                                    <input type="checkbox" id="remember_me" name="remember" class="sr-only" @change="checked = !checked" />
                                                     <div :class="checked ? 'border-brand-500 bg-brand-500' : 'bg-transparent border-gray-300 dark:border-gray-700'"
                                                         class="mr-3 flex h-5 w-5 items-center justify-center rounded-md border-[1.25px]">
                                                         <span :class="checked ? '' : 'opacity-0'">
@@ -146,22 +139,16 @@ unset($__errorArgs, $__bag); ?>" />
                                     </button>
                                 </div>
                             </form>
-
-                            <div class="mt-5">
-                                <p class="text-center text-sm font-normal text-gray-700 dark:text-gray-400 sm:text-start">
-                                    Don't have an account?
-                                    <a href="/signup" class="text-brand-500 hover:text-brand-600">Sign Up</a>
-                                </p>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right panel -->
-            <div class="bg-brand-950 relative hidden h-full w-full items-center lg:grid lg:w-1/2">
-                <div class="z-1 flex items-center justify-center">
-                    <?php if (isset($component)) { $__componentOriginal167809b0e97e5fdccea89d87d579f7f1 = $component; } ?>
+            <!-- ── Right Panel: Rotating Logos ────────────────────────────── -->
+            <div class="bg-brand-950 relative hidden h-full w-full items-center justify-center lg:flex lg:w-1/2 overflow-hidden">
+
+                
+                <?php if (isset($component)) { $__componentOriginal167809b0e97e5fdccea89d87d579f7f1 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal167809b0e97e5fdccea89d87d579f7f1 = $attributes; } ?>
 <?php $component = App\View\Components\Common\CommonGridShape::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('common.common-grid-shape'); ?>
@@ -181,13 +168,58 @@ unset($__errorArgs, $__bag); ?>" />
 <?php $component = $__componentOriginal167809b0e97e5fdccea89d87d579f7f1; ?>
 <?php unset($__componentOriginal167809b0e97e5fdccea89d87d579f7f1); ?>
 <?php endif; ?>
-                    <div class="flex max-w-xs flex-col items-center">
-                        <a href="/" class="mb-4 block">
-                            <img src="./images/logo/auth-logo.svg" alt="Logo" />
-                        </a>
-                        <p class="text-center text-gray-400">
-                            Free and Open-Source Tailwind CSS Admin Dashboard Template
-                        </p>
+
+                
+                <div class="relative z-10 flex flex-col items-center justify-center gap-10"
+                    x-data="{
+                        current: 0,
+                        logos: [
+                            { src: '/images/logos/dataaset.png',  alt: 'Dataset Logo' },
+                            { src: '/images/logos/logo_1.png',    alt: 'Logo 1' },
+                            { src: '/images/logos/LOGO2.png',     alt: 'Logo 2' },
+                        ],
+                        init() {
+                            setInterval(() => {
+                                this.current = (this.current + 1) % this.logos.length;
+                            }, 2500);
+                        }
+                    }">
+
+                    
+                    <div class="relative flex h-48 w-48 items-center justify-center">
+                        <template x-for="(logo, index) in logos" :key="index">
+                            <div
+                                x-show="current === index"
+                                x-transition:enter="transition ease-out duration-700"
+                                x-transition:enter-start="opacity-0 scale-75 rotate-12"
+                                x-transition:enter-end="opacity-100 scale-100 rotate-0"
+                                x-transition:leave="transition ease-in duration-500"
+                                x-transition:leave-start="opacity-100 scale-100 rotate-0"
+                                x-transition:leave-end="opacity-0 scale-75 -rotate-12"
+                                class="absolute inset-0 flex items-center justify-center">
+                                <img :src="logo.src" :alt="logo.alt"
+                                    class="max-h-40 max-w-40 object-contain drop-shadow-[0_0_30px_rgba(41,112,255,0.5)]" />
+                            </div>
+                        </template>
+                    </div>
+
+                    
+                    <div class="flex items-center gap-2">
+                        <template x-for="(logo, index) in logos" :key="index">
+                            <div
+                                @click="current = index"
+                                :class="current === index
+                                    ? 'w-6 bg-brand-400'
+                                    : 'w-2 bg-white/30 hover:bg-white/50'"
+                                class="h-2 rounded-full transition-all duration-300 cursor-pointer">
+                            </div>
+                        </template>
+                    </div>
+
+                    
+                    <div class="text-center">
+                        <h2 class="text-2xl font-bold text-white tracking-wide">Welcome Admin</h2>
+                        <p class="mt-2 text-sm text-gray-400">Manage your team, roles and permissions</p>
                     </div>
                 </div>
             </div>

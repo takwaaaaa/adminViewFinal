@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     protected $fillable = [
         'name', 'email', 'password',
@@ -51,15 +52,13 @@ class User extends Authenticatable
             $diskPath = storage_path('app/public/' . $this->avatar);
 
             if (file_exists($diskPath)) {
-                // Read the file directly and return as data URI
-                // This bypasses the broken Windows storage symlink completely
-                $mime     = mime_content_type($diskPath);
-                $data     = base64_encode(file_get_contents($diskPath));
+                $mime = mime_content_type($diskPath);
+                $data = base64_encode(file_get_contents($diskPath));
                 return "data:{$mime};base64,{$data}";
             }
         }
 
-        // Inline SVG initials fallback — no external requests
+        // Inline SVG initials fallback
         $name     = $this->name ?: 'User';
         $words    = preg_split('/\s+/', trim($name));
         $initials = strtoupper(

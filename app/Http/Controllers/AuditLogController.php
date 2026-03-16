@@ -11,19 +11,18 @@ class AuditLogController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = AuditLog::query()->latest('created_at');
+        $user = auth()->user();
+        abort_unless($user->isSuperAdmin() || $user->hasPermissionTo('consult_logs'), 403);
 
-        // Filter by action group
+        $query = AuditLog::with('actor')
+            ->latest();
+
         if ($request->filled('action')) {
             $query->where('action', $request->action);
         }
-
-        // Filter by actor
         if ($request->filled('actor_id')) {
             $query->where('actor_id', $request->actor_id);
         }
-
-        // Filter by date range
         if ($request->filled('from')) {
             $query->whereDate('created_at', '>=', $request->from);
         }
@@ -31,22 +30,15 @@ class AuditLogController extends Controller
             $query->whereDate('created_at', '<=', $request->to);
         }
 
-        $logs   = $query->paginate(30)->withQueryString();
-        $admins = User::where('role', 'superadmin')
-                      ->where('approval_status', 'approved')
-                      ->orderBy('name')
-                      ->get(['id', 'name']);
-
-        $actions = AuditLog::select('action')
-                            ->distinct()
-                            ->orderBy('action')
-                            ->pluck('action');
+        $logs    = $query->paginate(25)->withQueryString();
+        $actions = AuditLog::distinct()->orderBy('action')->pluck('action');
+        $admins  = User::where('role', 'superadmin')->orderBy('name')->get();
 
         return view('pages.audit-logs.index', [
             'title'   => 'Audit Logs',
             'logs'    => $logs,
-            'admins'  => $admins,
             'actions' => $actions,
+            'admins'  => $admins,
         ]);
     }
 }

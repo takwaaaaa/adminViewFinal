@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full dark">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? 'Dashboard' }} | TailAdmin - Laravel Tailwind CSS Admin Dashboard Template</title>
+    <title>{{ $title ?? 'Dashboard' }} | AdminView</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -15,12 +15,12 @@
         document.addEventListener('alpine:init', () => {
             Alpine.store('theme', {
                 init() {
-                    const saved = localStorage.getItem('theme');
-                    const system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                    this.theme = saved || system;
+                    // Always default to dark
+                    const saved = localStorage.getItem('theme') || 'dark';
+                    this.theme = saved;
                     this.updateTheme();
                 },
-                theme: 'light',
+                theme: 'dark',
                 toggle() {
                     this.theme = this.theme === 'light' ? 'dark' : 'light';
                     localStorage.setItem('theme', this.theme);
@@ -58,20 +58,21 @@
         });
     </script>
 
-    {{-- Prevent dark mode flash --}}
+    {{-- Prevent flash: always dark --}}
     <script>
         (function() {
-            const saved = localStorage.getItem('theme');
-            const system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            if ((saved || system) === 'dark') {
+            const saved = localStorage.getItem('theme') || 'dark';
+            if (saved === 'dark') {
                 document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
             }
         })();
     </script>
 </head>
 
 <body
-    class="bg-gray-50 dark:bg-gray-900 min-h-screen"
+    class="bg-gray-900 dark:bg-gray-900 min-h-screen"
     x-data="{ loaded: true }"
     x-init="
         $store.sidebar.isExpanded = window.innerWidth >= 1280;

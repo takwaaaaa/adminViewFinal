@@ -2,7 +2,7 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-/* ─── FONTS ─────────────────────────────────────────────────────────────────── */
+/* ─── FONTS ──────────────────────────────────────────────────────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 
 /* ─── BASE ───────────────────────────────────────────────────────────────────── */
@@ -16,99 +16,165 @@
   }
 
   body {
-    @apply bg-gray-50 dark:bg-gray-900;
+    background-color: #070B14;
+    color: #E2E8F0;
+  }
+
+  .dark body,
+  body {
+    background-color: #070B14;
   }
 
   /* Hide scrollbar but keep scrollable */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
 
   /* Custom thin scrollbar */
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-transparent;
-  }
+  .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-gray-300 dark:bg-gray-600;
+    border-radius: 9999px;
+    background: #1E3A5F;
   }
 }
 
 /* ─── SIDEBAR MENU ITEMS ─────────────────────────────────────────────────────── */
 @layer components {
-
-  /* Base menu item: horizontal flex row, icon + text side by side */
   .menu-item {
     @apply flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150 cursor-pointer;
   }
-
-  /* Active state */
   .menu-item-active {
-    @apply bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400;
+    background-color: rgba(41, 112, 255, 0.12);
+    color: #6EA8FE;
   }
-
-  /* Inactive state */
   .menu-item-inactive {
-    @apply text-gray-600 hover:bg-gray-100 hover:text-gray-800
-           dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200;
+    @apply text-gray-400 hover:text-gray-200;
   }
+  .menu-item-icon-active   { color: #2970FF; }
+  .menu-item-icon-inactive { @apply text-gray-500 group-hover:text-gray-300; }
+  .menu-item-text          { @apply whitespace-nowrap; }
 
-  /* Icon wrapper */
-  .menu-item-icon-active {
-    @apply text-brand-500 dark:text-brand-400;
-  }
-
-  .menu-item-icon-inactive {
-    @apply text-gray-500 group-hover:text-gray-700
-           dark:text-gray-400 dark:group-hover:text-gray-300;
-  }
-
-  /* Text label */
-  .menu-item-text {
-    @apply whitespace-nowrap;
-  }
-
-  /* Dropdown sub-items */
   .menu-dropdown-item {
     @apply flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150;
   }
+  .menu-dropdown-item-active   { color: #6EA8FE; }
+  .menu-dropdown-item-inactive { @apply text-gray-500 hover:text-gray-200; }
 
-  .menu-dropdown-item-active {
-    @apply text-brand-600 dark:text-brand-400;
-  }
-
-  .menu-dropdown-item-inactive {
-    @apply text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200;
-  }
-
-  /* "new" badge inside dropdown */
   .menu-dropdown-badge {
     @apply inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide;
   }
-  .menu-dropdown-badge-active {
-    @apply bg-brand-100 text-brand-700 dark:bg-brand-500/20 dark:text-brand-300;
-  }
-  .menu-dropdown-badge-inactive {
-    @apply bg-brand-500 text-white;
-  }
+  .menu-dropdown-badge-active   { background: rgba(41,112,255,0.15); color: #6EA8FE; }
+  .menu-dropdown-badge-inactive { @apply bg-brand-500 text-white; }
+}
 
-  /* "pro" badge inside dropdown */
-  .menu-dropdown-badge-pro {
-    @apply inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide;
-  }
-  .menu-dropdown-badge-pro-active {
-    @apply bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300;
-  }
-  .menu-dropdown-badge-pro-inactive {
-    @apply bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400;
-  }
+/* ─── GLOBAL DARK THEME ──────────────────────────────────────────────────────── */
+
+/* Page background */
+html, body {
+  background-color: #070B14 !important;
+}
+
+/* Sidebar */
+#sidebar,
+aside#sidebar {
+  background-color: #0D1117 !important;
+  border-right-color: #1A2236 !important;
+}
+
+/* Header */
+header,
+[x-data*="sidebar"] ~ div > header,
+.app-header {
+  background-color: #0D1117 !important;
+  border-bottom-color: #1A2236 !important;
+}
+
+/* All cards and bordered containers */
+[class*="rounded-2xl"],
+[class*="rounded-xl"],
+[class*="rounded-lg"] {
+  border-color: #1A2236;
+}
+
+/* Card backgrounds */
+.dark [class*="rounded-2xl"][class*="border"],
+.dark [class*="rounded-xl"][class*="border"],
+[class*="rounded-2xl"][class*="border"],
+[class*="rounded-xl"][class*="border"] {
+  background-color: #0D1117 !important;
+  border-color: #1A2236 !important;
+}
+
+/* Card text */
+[class*="rounded-2xl"][class*="border"] p,
+[class*="rounded-2xl"][class*="border"] span,
+[class*="rounded-xl"][class*="border"] p,
+[class*="rounded-xl"][class*="border"] span {
+  color: #94A3B8;
+}
+
+[class*="rounded-2xl"][class*="border"] h1,
+[class*="rounded-2xl"][class*="border"] h2,
+[class*="rounded-2xl"][class*="border"] h3,
+[class*="rounded-2xl"][class*="border"] h4,
+[class*="rounded-2xl"][class*="border"] h5,
+[class*="rounded-xl"][class*="border"] h1,
+[class*="rounded-xl"][class*="border"] h2,
+[class*="rounded-xl"][class*="border"] h3,
+[class*="rounded-xl"][class*="border"] h4,
+[class*="rounded-xl"][class*="border"] h5 {
+  color: #F1F5F9;
+}
+
+/* Table rows */
+table {
+  background-color: #0D1117 !important;
+}
+thead tr {
+  border-bottom-color: #1A2236 !important;
+}
+tbody tr {
+  border-bottom-color: #1A2236 !important;
+}
+tbody tr:hover {
+  background-color: #0F1620 !important;
+}
+
+/* Inputs */
+input, select, textarea {
+  background-color: #0D1117 !important;
+  border-color: #1A2236 !important;
+  color: #E2E8F0 !important;
+}
+input::placeholder, textarea::placeholder {
+  color: #4A5568 !important;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: #2970FF !important;
+  box-shadow: 0 0 0 3px rgba(41, 112, 255, 0.15) !important;
+  outline: none !important;
+}
+
+/* Dividers */
+hr,
+[class*="border-t"],
+[class*="border-b"] {
+  border-color: #1A2236 !important;
+}
+
+/* Dropdown panels */
+[x-show][class*="absolute"][class*="bg-white"],
+[x-show][class*="absolute"][class*="dark:bg-gray"] {
+  background-color: #0D1117 !important;
+  border-color: #1A2236 !important;
+}
+
+/* Blue glow on brand elements */
+.bg-brand-500 {
+  box-shadow: 0 0 16px rgba(41, 112, 255, 0.35);
 }
 
 /* ─── PRELOADER ──────────────────────────────────────────────────────────────── */
@@ -116,48 +182,15 @@
   position: fixed;
   inset: 0;
   z-index: 999999;
-  background: white;
+  background: #070B14;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: opacity 0.3s ease;
 }
 
-.dark #preloader {
-  background: #111827;
-}
-
-/* ─── CALENDAR ────────────────────────────────────────────────────────────────── */
-.custom-calendar .fc-toolbar-title {
-  @apply text-base font-semibold text-gray-800 dark:text-white;
-}
-.custom-calendar .fc-daygrid-day-number,
-.custom-calendar .fc-col-header-cell-cushion {
-  @apply text-sm text-gray-600 dark:text-gray-400;
-}
-.custom-calendar .fc-daygrid-day.fc-day-today {
-  @apply bg-brand-50 dark:bg-brand-500/10;
-}
-/* ─── DARK MODE: Card fixes ───────────────────────────────────── */
-.dark .card,
-.dark [class*="rounded-2xl"][class*="border"],
-.dark [class*="rounded-xl"][class*="border"] {
-  background-color: rgb(30 41 59) !important; /* slate-800 */
-  border-color: rgb(51 65 85) !important;     /* slate-700 */
-  color: rgb(226 232 240);                     /* slate-200 */
-}
-
-.dark [class*="rounded-2xl"][class*="border"] p,
-.dark [class*="rounded-2xl"][class*="border"] span,
-.dark [class*="rounded-xl"][class*="border"] p,
-.dark [class*="rounded-xl"][class*="border"] span {
-  color: rgb(203 213 225); /* slate-300 */
-}
-
-.dark [class*="rounded-2xl"][class*="border"] h1,
-.dark [class*="rounded-2xl"][class*="border"] h2,
-.dark [class*="rounded-2xl"][class*="border"] h3,
-.dark [class*="rounded-2xl"][class*="border"] h4,
-.dark [class*="rounded-2xl"][class*="border"] h5 {
-  color: rgb(241 245 249); /* slate-100 */
-}
+/* ─── SCROLLBAR GLOBAL ───────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #070B14; }
+::-webkit-scrollbar-thumb { background: #1E3A5F; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #2970FF; }

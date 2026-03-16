@@ -59,12 +59,6 @@
         <nav class="mb-6">
             <div class="flex flex-col gap-4">
                 @foreach ($menuGroups as $gi => $group)
-
-                {{-- Skip superadmin-only groups for non-superadmins --}}
-                @if(!empty($group['superadmin']) && (!auth()->check() || !auth()->user()->isSuperAdmin()))
-                    @continue
-                @endif
-
                 <div>
                     {{-- Group title --}}
                     <h2 class="mb-4 flex text-xs font-medium uppercase tracking-widest text-gray-400 dark:text-gray-500"
@@ -91,19 +85,16 @@
                                     (!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen) ? 'xl:justify-center' : ''
                                 ]">
 
-                                {{-- icon --}}
                                 <span class="shrink-0"
                                     :class="isOpen({{ $gi }}, {{ $ii }}) ? 'text-brand-500' : 'text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200'">
                                     {!! MenuHelper::getIconSvg($item['icon']) !!}
                                 </span>
 
-                                {{-- label --}}
                                 <span x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
                                       class="flex-1 whitespace-nowrap overflow-hidden text-left">
                                     {{ $item['name'] }}
                                 </span>
 
-                                {{-- NEW badge --}}
                                 @if(!empty($item['new']))
                                 <span x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
                                       class="inline-flex items-center rounded bg-brand-500 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-white">
@@ -111,7 +102,6 @@
                                 </span>
                                 @endif
 
-                                {{-- chevron --}}
                                 <svg x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
                                      class="ml-auto h-4 w-4 shrink-0 transition-transform duration-200"
                                      :class="isOpen({{ $gi }}, {{ $ii }}) ? 'rotate-180 text-brand-500' : ''"
